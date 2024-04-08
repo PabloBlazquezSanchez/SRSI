@@ -1,1 +1,43 @@
 #!/bin/bash
+
+# Check command entries
+if [ $# -ne 2 ]; then
+    echo "Uso: $0 id path"
+    exit 1
+fi
+
+id="$1"
+path="$2"
+bck="$HOME/bckdir"
+files="$bck/files"
+
+# Check if bckdir exist
+if [ ! -d "$bck" ]; then
+    echo "El directorio $bck no existe, se procede a su creación"
+    mkdir "$bck"
+    mkdir "$files"
+    touch "$bck/mypaths.txt"
+fi
+
+# Check if id exist in bckdir
+if [ -e "$files/$id" ]; then
+    echo "El identificador '$id' ya existe en $files."
+    exit 1
+fi
+
+# Check if path exist
+if [ ! -e "$path" ]; then
+    echo "El archivo en la ruta especificada ('$path') no existe."
+    exit 1
+fi
+# Copy the file with the specified id into bckdir
+cp "$path" "$files/$id"
+
+# Create symbolic link from path to bckdir file
+ln -sf "$files/$id" "$path"
+
+# Upload file mypaths.txt adding the entry id,path
+echo "$id,$path" >> $bck/mypaths.txt
+
+# Notify user
+echo "El archivo con identificador '$id' ha sido copiado a $files y se ha creado un enlace simbólico desde '$path'. La entrada '$id,$path' ha sido añadida a mypaths.txt."
