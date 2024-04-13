@@ -6,28 +6,32 @@ if [ $# -ne 1 ]; then
     exit 1
 fi
 
-# Directorio donde se almacenan los archivos de copia de seguridad
-backup_dir="files"
+id_borrar=$1
+bck="$HOME/bckdir"
+files="$bck/files"
+
 
 # Verificar si el archivo existe en el directorio de copia de seguridad
-if [ ! -e "$backup_dir/$1" ]; then
-    echo "El archivo $1 no existe en el directorio de copia de seguridad."
+if [ ! -e "$files/$id_borrar" ]; then
+    echo "El archivo $id_borrar no existe en el directorio de copia de seguridad."
     exit 1
 fi
 
 # Obtener el nombre del archivo original del enlace simbólico
-original_file=$(readlink "$backup_dir/$1")
+original_file=$(grep "^$id_borrar," "$bck/mypaths.txt" | cut -d ',' -f 2)
 
 # Verificar si el enlace simbólico existe
 if [ ! -e "$original_file" ]; then
-    echo "El archivo original vinculado al identificador $1 ya no existe."
+    echo "El archivo original vinculado al identificador $id_borrar ya no existe."
     exit 1
 fi
 
 # Eliminar el enlace simbólico
-rm "$backup_dir/$1"
+unlink "$files/$id_borrar"
 
+echo $(ls -l /home/pablozar12)
+exit 0
 # Reemplazar el enlace simbólico con el archivo original
-mv "$original_file" "$backup_dir/$1"
+cp "$original_file" "$files/$id_borrar"
 
-echo "Se ha eliminado el identificador $1 y se ha restaurado el archivo original."
+echo "Se ha eliminado el identificador $id_borrar y se ha restaurado el archivo original."
