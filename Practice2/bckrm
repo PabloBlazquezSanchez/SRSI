@@ -1,1 +1,33 @@
 #!/bin/bash
+
+# Verificar que se haya pasado un argumento
+if [ $# -ne 1 ]; then
+    echo "Uso: $0 id"
+    exit 1
+fi
+
+# Directorio donde se almacenan los archivos de copia de seguridad
+backup_dir="files"
+
+# Verificar si el archivo existe en el directorio de copia de seguridad
+if [ ! -e "$backup_dir/$1" ]; then
+    echo "El archivo $1 no existe en el directorio de copia de seguridad."
+    exit 1
+fi
+
+# Obtener el nombre del archivo original del enlace simbólico
+original_file=$(readlink "$backup_dir/$1")
+
+# Verificar si el enlace simbólico existe
+if [ ! -e "$original_file" ]; then
+    echo "El archivo original vinculado al identificador $1 ya no existe."
+    exit 1
+fi
+
+# Eliminar el enlace simbólico
+rm "$backup_dir/$1"
+
+# Reemplazar el enlace simbólico con el archivo original
+mv "$original_file" "$backup_dir/$1"
+
+echo "Se ha eliminado el identificador $1 y se ha restaurado el archivo original."

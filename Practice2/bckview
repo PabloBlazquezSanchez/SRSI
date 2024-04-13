@@ -2,6 +2,12 @@
 
 bck="$HOME/bckdir"
 
+#Check if bckview command line has arguments
+if [ $# -ne 0 ]; then
+    echo "$0 no necesita argumentos para su funcionamiento. Uso: $0"
+    exit 1
+fi
+
 # Check if bckdir exist
 if [ ! -d "$bck" ]; then
     echo "El directorio $bck no existe, por lo que no se lista ninguna información"

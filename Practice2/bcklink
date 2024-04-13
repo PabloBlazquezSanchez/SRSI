@@ -7,7 +7,7 @@ if [ $# -ne 2 ]; then
 fi
 
 id="$1"
-path="$2"
+path=$(readlink -f "$2")
 bck="$HOME/bckdir"
 files="$bck/files"
 
@@ -30,11 +30,17 @@ if [ ! -e "$path" ]; then
     echo "El archivo en la ruta especificada ('$path') no existe."
     exit 1
 fi
+
+# Getting the absolute path of $path
+# abspath=$(readlink -f "$path")
+
 # Copy the file with the specified id into bckdir
 cp "$path" "$files/$id"
 
+
 # Create symbolic link from path to bckdir file
 ln -sf "$files/$id" "$path"
+
 
 # Upload file mypaths.txt adding the entry id,path
 echo "$id,$path" >> $bck/mypaths.txt

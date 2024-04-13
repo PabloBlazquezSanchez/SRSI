@@ -1,1 +1,55 @@
 #!/bin/bash
+
+# Verifica que se proporcionen los argumentos correctos
+if [ $# -ne 2 ]; then
+    echo "Uso: $0 old_id new_id"
+    exit 1
+fi
+
+bck="$HOME/bckdir"
+files="$bck/files"
+old_id=$1
+new_id=$2
+
+# Verifica si old_id existe en mypaths.txt y obtiene la ruta asociada
+old_path=$(grep "^$old_id," "$bck/mypaths.txt" | cut -d ',' -f 2)
+
+if [ -z "$old_path" ]; then
+    echo "El identificador $old_id no existe en mypaths.txt"
+    exit 1
+fi
+
+# Verifica si new_id ya existe en mypaths.txt
+if grep -q "^$new_id," "$bck/mypaths.txt"; then
+    echo "El nuevo identificador $new_id ya existe en mypaths.txt"
+    exit 1
+fi
+    
+# Cambia el identificador en mypaths.txt
+sed -i "s/^$old_id,/$new_id,/" "$bck/mypaths.txt"
+echo "Se ha cambiado el identificador $old_id por $new_id en mypaths.txt"
+
+# Verifica si existe el archivo id en el directorio files
+if [ -f "$files/$old_id" ]; then
+    # Cambia el identificador en el archivo id
+    mv "$files/$old_id" "$files/$new_id"
+    echo "Se ha cambiado el identificador $old_id por $new_id en $files"
+else
+    echo "El archivo $old_id no existe en el directorio $files"
+    exit 1
+fi
+
+# Verifica si existe un enlace simbólico apuntando a old_id
+if [ -L "$old_path" ]; then
+    link_target=$(readlink "$old_path")
+    if [ "$link_target" == "$files/$old_id" ]; then
+        # Cambia el objetivo del enlace simbólico
+        ln -sfT "$files/$new_id" "$old_path"
+        echo "Se ha cambiado el enlace simbólico de $old_id a $new_id en $old_path"
+    fi
+else
+    echo "No se encontró ningún enlace simbólico apuntando a $old_id en $old_path"
+    exit 1
+fi
+
+exit 0
