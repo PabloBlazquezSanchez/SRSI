@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Verificar que se haya pasado un argumento
+# Verify that an argument has been passed
 if [ $# -ne 1 ]; then
     echo "Uso: $0 id"
     exit 1
@@ -10,28 +10,28 @@ id_borrar=$1
 bck="$HOME/bckdir"
 files="$bck/files"
 
-
-# Verificar si el archivo existe en el directorio de copia de seguridad
+# Verify if the file exists in the backup directory
 if [ ! -e "$files/$id_borrar" ]; then
     echo "El archivo $id_borrar no existe en el directorio de copia de seguridad."
     exit 1
 fi
+	
+my_path=$(grep "^$id_borrar," "$bck/mypaths.txt" | cut -d ',' -f 2)
 
-# Obtener el nombre del archivo original del enlace simbólico
-original_file=$(grep "^$id_borrar," "$bck/mypaths.txt" | cut -d ',' -f 2)
-
-# Verificar si el enlace simbólico existe
-if [ ! -e "$original_file" ]; then
-    echo "El archivo original vinculado al identificador $id_borrar ya no existe."
+if [ -z "$my_path" ]; then
+    echo "El identificador $id_borrar no existe en $bck/mypaths.txt"
     exit 1
 fi
 
-# Eliminar el enlace simbólico
-unlink "$files/$id_borrar"
+# Delete the line that contains the id in mypaths.txt
+sed -i "/$id_borrar,/d" "$bck/mypaths.txt"
 
-echo $(ls -l /home/pablozar12)
-exit 0
-# Reemplazar el enlace simbólico con el archivo original
-cp "$original_file" "$files/$id_borrar"
+# Verify if the symbolic link exists, to remove it
+if [ -L "$my_path" ]; then
+	rm "$my_path"
+fi
+
+cp "$files/$id_borrar" "$my_path"
+rm "$files/$id_borrar"
 
 echo "Se ha eliminado el identificador $id_borrar y se ha restaurado el archivo original."

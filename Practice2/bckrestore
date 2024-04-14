@@ -1,1 +1,27 @@
 #!/bin/bash
+
+# Check command entries
+if [ $# -ne 1 ]; then
+    echo "Uso: $0 id"
+    exit 1
+fi
+
+bck="$HOME/bckdir"
+files="$bck/files"
+id=$1
+
+# Check if the ID exists
+if [ ! -e "$files/$id" ]; then
+    echo "El ID '$id' no existe."
+    exit 1
+fi
+
+path_rest=$(grep "^$id," "$bck/mypaths.txt" | cut -d ',' -f 2)
+
+# Create the symbolic link if it doesn't exist
+if [ ! -L "$path_rest" ]; then
+    ln -s "$files/$id" "$path_rest"
+    echo -e "Fichero de la copia con identificador '$id' restaurado correctamente en '$path_rest'."
+else
+    echo "El enlace simbólico '$path_rest' ya existe."
+fi
