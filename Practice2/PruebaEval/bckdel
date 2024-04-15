@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Check command entries
+if [ $# -ne 1 ]; then
+    echo "Uso: $0 id_version"
+    exit 1
+fi
+
+bck="$HOME/bckdir"
+id_folder="$bck/version/$1"
+
+# Check if the version exists
+if [ ! -d "$id_folder" ]; then
+    echo "Versión $1 no existe."
+    exit 1
+fi
+
+rm -rf "$id_folder"
+
+echo "Versión $1 eliminada (borrado directorio $id_folder)"

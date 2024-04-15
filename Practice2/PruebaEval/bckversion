@@ -1,0 +1,36 @@
+#!/bin/bash
+
+# Check command entries
+if [ $# -ne 1 ]; then
+    echo "Uso: $0 id_version"
+    exit 1
+fi
+
+
+versionid=$1
+bck="$HOME/bckdir"
+version="$bck/version"
+files="$bck/files"
+
+if [ ! -d "$bck" ]; then
+    echo "El directorio $version no existe, se procede a su creación"
+    mkdir "$bck"
+    mkdir "$files"
+    mkdir "$version"
+    touch "$bck/mypaths.txt"
+fi
+
+# Verify if the version directory already exists
+if [ -d "$version/$versionid" ]; then
+    echo "Borrando versión existente: $versiondir"
+    rm -rf "$version/$versionid"
+fi
+
+# Create the version directory
+mkdir -p "$version/$versionid"
+
+# Copy the content of the files folder to the version folder
+echo "Copiando archivos a la versión $versionid"
+cp -r $files/* "$version/$versionid"
+
+echo "Versión $versionid creada exitosamente"

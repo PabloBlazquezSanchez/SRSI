@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# Check command entries
+if [ $# -ne 1 ]; then
+    echo "Uso: $0 id_version"
+    exit 1
+fi
+
+bck="$HOME/bckdir"
+id_folder="$bck/version/$1"
+
+# Check if the version exists
+if [ ! -d "$id_folder" ]; then
+    echo "Versión $1 no existe."
+    exit 1
+fi
+
+# Replace the contents of ~/bckdir/files/ with the contents of the parameter version
+if [ "$(ls -A $bck/files/)" ]; then
+    echo -e "Borrando $bck/files/ para proceder al reemplazo...\n"
+    rm -r "$bck/files/"
+fi
+cp -R "$id_folder"* "$bck/files/"
+
+echo "Contenidos de $bck/files/ reemplazados por la versión $1."
