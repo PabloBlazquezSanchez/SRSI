@@ -1,0 +1,19 @@
+#!/bin/bash
+
+if [ $# -ne 2 ]; then
+    echo "Usage: $0 <command> <path>"
+    exit 1
+fi
+
+# Get the command and absolute path
+command=$1
+path=$2
+
+# Obtain UID and username
+uid=$(id -u)
+username=$(id -un)
+
+# Generate message for custom log
+message="$uid,$username,$command,$path"
+
+logger -t customlog $message
