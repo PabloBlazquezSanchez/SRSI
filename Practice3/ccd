@@ -1,11 +1,15 @@
 #!/bin/bash
 
+#########################################AUTORES#############################################
+# - Para ejecutar el comando en el hilo principal se debe hacer uso de la instrucción source
+# - Uso: source ccd [-L|-P] <ruta>
+#############################################################################################
+
 # Check if at least one parameter was provided
 if [ "$#" -lt 1 ]; then
     echo "Uso: ccd [-L|-P] <ruta>"
     exit 1
 fi
-actual=$(pwd)
 
 # Initialize an empty string for the options
 opciones=""
@@ -27,10 +31,10 @@ done
 # Invokes the cd command with the options and the path
 if [ -z "$opciones" ]; then
     echo "cd $ruta"
-    source cd $ruta
+    cd $ruta
 else
     echo "cd $opciones $ruta"
-    source cd $opciones $ruta
+    cd $opciones $ruta
 fi
 
 # Check if the cd command was successful
@@ -39,7 +43,7 @@ if [ "$?" -eq 0 ]; then
     ruta_absoluta=$(pwd)
 
     # Invokes the clog script with the command and the absolute path
-    $actual/clog "cd" "$ruta_absoluta"
+    clog "cd" "$ruta_absoluta"
 else
     echo "ccd: no se pudo cambiar al directorio: $ruta"
 fi

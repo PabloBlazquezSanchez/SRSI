@@ -1,1 +1,50 @@
 #!/bin/bash
+
+#########################################AUTORES#############################################
+# - Para ejecutar el comando en el hilo principal se debe hacer uso de la instrucción source
+# - Uso: source crm [Opciones] <ruta>
+#############################################################################################
+
+# Check if at least one parameter was provided
+if [ "$#" -lt 1 ]; then
+    echo "Uso: crm [Opciones] <ruta>"
+    exit 1
+fi
+
+# Initialize an empty variable to store the options
+opciones=""
+# Initialize an empty variable to store the path
+ruta=""
+
+# Iterates over the parameters until a path is found
+for parametro in "$@"; do
+    # Check if the parameter is an option
+    if [[ $parametro == -* ]]; then
+        # Add the option to the options string
+        opciones="$opciones $parametro"
+    else
+        # The parameter is a path, so exit the loop
+        ruta=$parametro
+        break
+    fi
+done
+
+# Invokes the cd command with the options and the path
+if [ -z "$opciones" ]; then
+    echo "rm $ruta"
+    rm $ruta
+else
+    echo "rm $opciones $ruta"
+    rm $opciones $ruta
+fi
+
+# Check if the cd command was successful
+if [ "$?" -eq 0 ]; then
+    # Obtain the absolute path after changing the directory
+    ruta_absoluta=$(pwd)
+
+    # Invokes the clog script with the command and the absolute path
+    $ruta_absoluta/clog "rm" "$ruta"
+else
+    echo "crm: no se pudo cambiar al directorio: $ruta"
+fi
