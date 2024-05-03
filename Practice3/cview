@@ -10,40 +10,55 @@ sylogDir="/var/log/syslog"
 # %-4s: Aligns the text to the left with a width of 4 characters
 # %-6s: Aligns the text to the left with a width of 6 characters
 # %s: Prints the text
-formato="%-4s %-6s %-6s %s\n"
+formato="%-4s %-10s %-6s %s\n"
 
 # Prints the headers
 printf "$formato" "id" "user" "action" "path"
 
+# Function that prints the event
+function Printer(){
+    # Saves the line in a variable
+    linea="$1"
+
+    # Pattern to search for "customlog"
+    patron=".*customlog:.*"
+
+    # Check using regular expression
+    if [[ $linea =~ $patron ]]; then
+        # Extracts the information from the event
+        resultado=$(echo "$linea" | awk -F'customlog: ' '{print $2}' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+
+        # Saves the information in variables using the IFS variable
+        # IFS: Internal Field Separator
+        # read: Reads the information from the variable
+        # -r: Ignores the backslashes
+        # <<<: Redirects the information to the variable
+        # $resultado: Variable that contains the information
+        IFS=',' read -r id user action path <<< "$resultado"
+
+        # Checks if the event occurred in the current directory or in a subdirectory
+        if [[ "$path" == "$directorio_actual"* ]]; then
+            # Prints the event
+            printf "$formato" "$id" "$user" "$action" "$path"
+        fi
+    fi
+
+    
+}
+
 # Check if a parameter was provided
 if [ "$#" -eq 1 ]; then
     # Filters the events by the provided action
-    grep "$1" $sylogDir | while read -r linea; do
-        # Extracts the fields of the line
-        id=$(echo $linea | cut -d' ' -f1)
-        user=$(echo $linea | cut -d' ' -f2)
-        action=$(echo $linea | cut -d' ' -f3)
-        path=$(echo $linea | cut -d' ' -f4-)
+    grep -E "$1" $sylogDir | while IFS= read -r linea; do
 
-        # Checks if the event occurred in the current directory or in a subdirectory
-        if [[ $path == $directorio_actual* ]]; then
-            # Prints the event
-            printf "$formato" "$id" "$user" "$action" "$path"
-        fi
+        # Calls the function that prints the event
+        Printer "$linea"
     done
 else
     # Show all events
-    cat $sylogDir | while read -r linea; do
-        # Extracts the fields of the line
-        id=$(echo $linea | cut -d' ' -f1)
-        user=$(echo $linea | cut -d' ' -f2)
-        action=$(echo $linea | cut -d' ' -f3)
-        path=$(echo $linea | cut -d' ' -f4-)
+    cat $sylogDir | while IFS= read -r linea; do
 
-        # Checks if the event occurred in the current directory or in a subdirectory
-        if [[ $path == $directorio_actual* ]]; then
-            # Prints the event
-            printf "$formato" "$id" "$user" "$action" "$path"
-        fi
+        # Calls the function that prints the event
+        Printer "$linea"
     done
 fi
