@@ -11,16 +11,14 @@ if [ "$#" -lt 1 ]; then
     exit 1
 fi
 
-
+# Check if files or directories exist, then invoke the clog script
 for parametro in "$@"; do
     if [ -e "$parametro" ]; then
         # Gets the absolute path of the provided parameter
         ruta_absoluta=$(readlink -f "$parametro")
 
-        current_dir=$(pwd)
-        
         # Invokes the clog script with the command and the absolute path
-        $current_dir/clog "rm" "$ruta_absoluta"
+        clog "rm" "$ruta_absoluta"
     fi
 done
 

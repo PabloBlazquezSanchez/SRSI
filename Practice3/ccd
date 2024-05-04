@@ -5,23 +5,25 @@
 # - Uso: source ccd [-L|-P] <ruta>
 #############################################################################################
 
-# Check if at least one parameter was provided
-if [ "$#" -lt 1 ]; then
-    echo "Uso: ccd [-L|-P] <ruta>"
-    exit 1
-fi
+validParameter=false # Flag to check if the provided parameter is valid
 
+# Check if files or directories exist, then invoke the clog script
 for parametro in "$@"; do
     if [ -e "$parametro" ]; then
         # Get the absolute path of the provided parameter
         ruta_absoluta=$(readlink -f "$parametro")
 
-        current_dir=$(pwd)
-        
+        validParameter=true
+
         # Invokes the clog script with the command and the absolute path
-        $current_dir/clog "cd" "$ruta_absoluta"
+        clog "cd" "$ruta_absoluta"
     fi
 done
+
+# If the provided parameter is not valid, invoke the clog script with the command and the current directory
+if [ $validParameter == false ]; then
+    clog "cd" "$HOME"
+fi
 
 # Invoke the cd command with the provided parameters
 cd "$@"
